@@ -6,12 +6,20 @@
 
     <description><![CDATA[
         <p>EN: Helps developers manage work time with custom reminders.</p>
-        <p>CN: 这是一个定时提醒工具，目的是让你在繁忙的编码工作中间歇的休息下，劳逸结合~</p>
         <p>Features:</p>
         <ul>
             <li>Set custom reminder intervals</li>
             <li>Notification popups</li>
             <li>Simple configuration</li>
+        </ul>
+        </br>
+        </br>
+        <p>CN: 这是一个定时提醒工具，目的是让你在繁忙的编码工作中间歇的休息下，劳逸结合~</p>
+        <p>特性:</p>
+        <ul>
+            <li>设置自定义提醒间隔</li>
+            <li>通知弹窗</li>
+            <li>简单配置</li>
         </ul>
         </br>
     ]]></description>
@@ -48,12 +56,28 @@
         </action>-->
 
         <!-- 注册Action -->
-        <action
+        <!--<action
                 id="SetReminderAction"
                 class="com.umizhang.reminder.action.SetReminderAction"
                 text="Set Reminder"
                 description="Add a timed reminder">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>-->
+
+        <action
+                id="SetReminderAction"
+                class="com.umizhang.reminder.action.SetReminderAction"
+                text="Set Timer Reminder"
+                description="Set one-time or repeating reminders">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+
+        <action
+                id="StopReminderAction"
+                class="com.umizhang.reminder.action.StopReminderAction"
+                text="Stop Current Reminder"
+                description="Stop active repeating reminders">
+            <add-to-group group-id="ToolsMenu" anchor="after" relative-to-action="SetReminderAction"/>
         </action>
     </actions>
 </idea-plugin>
