@@ -2,14 +2,29 @@
     <id>com.umizhang.unique.plugin.id</id>
     <name>Timer Reminder Tool</name>
     <version>${project.version}</version>
-    <vendor email="umizhang0910@126.com" url="">Umizhang</vendor>
-    <idea-version since-build="233.14475.28" until-build="241.*"/>
+    <vendor email="umizhang0910@126.com" url="https://xxx.com">Umizhang</vendor>
 
     <description><![CDATA[
-        <p>This is a timer reminder tool. Its purpose is to allow you to take short breaks during your busy coding work, achieving a balance between work and rest.</p>
+        <p>EN: Helps developers manage work time with custom reminders.</p>
+        <p>CN: 这是一个定时提醒工具，目的是让你在繁忙的编码工作中间歇的休息下，劳逸结合~</p>
+        <p>Features:</p>
+        <ul>
+            <li>Set custom reminder intervals</li>
+            <li>Notification popups</li>
+            <li>Simple configuration</li>
+        </ul>
         </br>
-        <p>这是一个定时提醒工具，目的是让你在繁忙的编码工作中间歇的休息下，劳逸结合~</p>
     ]]></description>
+
+    <change-notes><![CDATA[
+        <p>Initial release with core features:</p>
+        <ul>
+            <li>Single timer functionality</li>
+            <li>Custom message support</li>
+        </ul>
+    ]]></change-notes>
+
+    <idea-version since-build="233.0" until-build="241.*"/>
 
     <!-- 依赖项 -->
     <depends>com.intellij.modules.platform</depends>
