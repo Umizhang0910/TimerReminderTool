@@ -31,6 +31,7 @@ public class SetReminderAction extends AnAction {
             try {
                 ReminderService service = ApplicationManager.getApplication().getService(ReminderService.class);
                 service.scheduleReminder(config);
+                Messages.showInfoMessage("Reminder set successfully!  It will notify in " + config.initialDelay + " minutes.", "Success");
             } catch (Exception ex) {
                 showError("Failed to set: " + ex.getMessage());
             }

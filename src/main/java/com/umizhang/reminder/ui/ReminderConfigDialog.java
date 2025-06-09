@@ -44,7 +44,7 @@ public class ReminderConfigDialog extends DialogWrapper {
         panel.add(new JLabel("Reminder Type:"));
         reminderTypeCombo = new ComboBox<>(Arrays.stream(ReminderType.values()).map(ReminderType::getDisplayName).toArray(String[]::new));
         reminderTypeCombo.addActionListener(e -> {
-            boolean isRepeating = "Recurring Reminder".equals(reminderTypeCombo.getSelectedItem());
+            boolean isRepeating = ReminderType.RECURRING.displayName.equals(reminderTypeCombo.getSelectedItem());
             intervalField.setVisible(isRepeating);
 //            intervalField.getParent().getComponent(4).setVisible(isRepeating);
         });
@@ -68,7 +68,7 @@ public class ReminderConfigDialog extends DialogWrapper {
         return new ReminderConfig(
                 Long.parseLong(minutesField.getText()),
                 messageField.getText(),
-                "Recurring Reminder".equals(reminderTypeCombo.getSelectedItem()),
+                ReminderType.RECURRING.displayName.equals(reminderTypeCombo.getSelectedItem()),
                 intervalField.isVisible() ? Long.parseLong(intervalField.getText()) : 0
         );
     }
@@ -83,7 +83,7 @@ public class ReminderConfigDialog extends DialogWrapper {
         ReminderSettings.State settings = ReminderSettings.getInstance().getState();
         settings.initialDelay = Long.parseLong(minutesField.getText());
         settings.defaultMessage = messageField.getText();
-        settings.isRepeating = "Recurring Reminder".equals(reminderTypeCombo.getSelectedItem());
+        settings.isRepeating = ReminderType.RECURRING.displayName.equals(reminderTypeCombo.getSelectedItem());
 
         if (settings.isRepeating) {
             settings.intervalMinutes = Long.parseLong(intervalField.getText());
