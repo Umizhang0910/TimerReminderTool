@@ -17,10 +17,11 @@ import java.util.concurrent.TimeUnit;
 public final class ReminderService {
 
     private final ScheduledExecutorService executorService = ApplicationManager.getApplication().getService(ThreadPoolScheduler.class).getScheduler();
-
     private ScheduledFuture<?> reminderTask;
-    private Runnable runnableTask;
     private long intervalMinutes;
+
+
+
 
     public void scheduleReminder(ReminderConfigDialog.ReminderConfig config) {
         // Cancel existing reminder
@@ -28,7 +29,7 @@ public final class ReminderService {
 
         intervalMinutes = config.interval;
         // Create reminder task
-        runnableTask = () -> showNotification(config.message);
+        Runnable runnableTask = () -> showNotification(config.message);
 
         if (config.isRepeating) {
             // Schedule repeating reminder
@@ -59,10 +60,10 @@ public final class ReminderService {
     private void showNotification(String message) {
         ApplicationManager.getApplication().invokeLater(() -> {
             Notification notification = new Notification("ReminderGroup", // Must be registered in plugin.xml
-                    "Timer Reminder", message, NotificationType.INFORMATION);
+                    "Timer reminder", message, NotificationType.INFORMATION);
             // Add stop action for recurring reminders
             if (reminderTask != null && !reminderTask.isDone() && intervalMinutes > 0) {
-                notification.addAction(NotificationAction.createSimple("Stop Reminder",
+                notification.addAction(NotificationAction.createSimple("Stop reminder",
                         () -> ApplicationManager.getApplication().getService(ReminderService.class)
                                 .stopRepeatingReminder()));
             }

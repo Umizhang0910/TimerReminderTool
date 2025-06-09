@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class ReminderConfigDialog extends DialogWrapper {
     private JTextField minutesField;
@@ -21,10 +22,9 @@ public class ReminderConfigDialog extends DialogWrapper {
 
         // Load saved settings
         ReminderSettings.State settings = ReminderSettings.getInstance().getState();
-        assert settings != null;
         minutesField.setText(String.valueOf(settings.initialDelay));
         messageField.setText(settings.defaultMessage);
-        reminderTypeCombo.setSelectedItem(settings.isRepeating ? "Recurring Reminder" : "One-time");
+        reminderTypeCombo.setSelectedItem(settings.isRepeating ? ReminderType.RECURRING.displayName : ReminderType.ONE_TIME.displayName);
         if (settings.isRepeating) {
             intervalField.setText(String.valueOf(settings.intervalMinutes));
             intervalField.setVisible(true);
@@ -42,7 +42,7 @@ public class ReminderConfigDialog extends DialogWrapper {
 
         // Reminder type input
         panel.add(new JLabel("Reminder Type:"));
-        reminderTypeCombo = new ComboBox<>(new String[]{"One-time", "Recurring Reminder"});
+        reminderTypeCombo = new ComboBox<>(Arrays.stream(ReminderType.values()).map(ReminderType::getDisplayName).toArray(String[]::new));
         reminderTypeCombo.addActionListener(e -> {
             boolean isRepeating = "Recurring Reminder".equals(reminderTypeCombo.getSelectedItem());
             intervalField.setVisible(isRepeating);
@@ -81,13 +81,35 @@ public class ReminderConfigDialog extends DialogWrapper {
 
     private void saveSettings() {
         ReminderSettings.State settings = ReminderSettings.getInstance().getState();
-        assert settings != null;
         settings.initialDelay = Long.parseLong(minutesField.getText());
         settings.defaultMessage = messageField.getText();
         settings.isRepeating = "Recurring Reminder".equals(reminderTypeCombo.getSelectedItem());
 
         if (settings.isRepeating) {
             settings.intervalMinutes = Long.parseLong(intervalField.getText());
+        }
+    }
+
+    private enum ReminderType {
+        ONE_TIME("One-time"), RECURRING("Recurring");
+
+        private final String displayName;
+
+        ReminderType(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public static ReminderType fromDisplayName(String displayName) {
+            for (ReminderType type : values()) {
+                if (type.displayName.equals(displayName)) {
+                    return type;
+                }
+            }
+            return ONE_TIME; // Default to ONE_TIME if not found
+        }
+
+        public String getDisplayName() {
+            return displayName;
         }
     }
 
