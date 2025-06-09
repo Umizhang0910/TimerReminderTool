@@ -8,6 +8,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.umizhang.core.ThreadPoolScheduler;
 import com.umizhang.reminder.ui.ReminderConfigDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -15,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public final class ReminderService {
-
+    private static final Logger log = LoggerFactory.getLogger(ReminderService.class);
     private final ScheduledExecutorService executorService = ApplicationManager.getApplication().getService(ThreadPoolScheduler.class).getScheduler();
     public boolean isRepeating;
     private ScheduledFuture<?> reminderTask;
@@ -23,6 +25,10 @@ public final class ReminderService {
     private ReminderState state = ReminderState.STOPPED;
     private long remainingTime;
     private String currentMessage;
+
+
+    private ScheduledFuture<?> timerUpdateTask;
+
 
     public void scheduleReminder(ReminderConfigDialog.ReminderConfig config) {
         // Cancel existing reminder
@@ -126,6 +132,36 @@ public final class ReminderService {
 
     public boolean isReminderPaused() {
         return state == ReminderState.PAUSED;
+    }
+
+    public String getStatusText() {
+        if (state == ReminderState.ACTIVE) {
+            // 计算剩余时间并格式化
+            long seconds = getRemainingSeconds();
+            long mins = seconds / 60;
+            long secs = seconds % 60;
+            return String.format("⏱ %02d:%02d", mins, secs);
+        } else if (state == ReminderState.PAUSED) {
+            return "⏸ Reminder Paused";
+        }
+        return "⏰ No reminder";
+    }
+
+    // 调试用状态覆盖
+    public void debugSetState(ReminderState state) {
+        this.state = state;
+        System.out.println("调试：服务状态设置为 " + state);
+    }
+
+    private long getRemainingSeconds() {
+        if (reminderTask != null && !reminderTask.isDone()) {
+            try {
+                return reminderTask.getDelay(TimeUnit.SECONDS);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        return 0;
     }
 
     private enum ReminderState {ACTIVE, PAUSED, STOPPED}

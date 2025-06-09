@@ -9,6 +9,12 @@ import com.umizhang.reminder.ui.ReminderConfigDialog;
 import org.jetbrains.annotations.NotNull;
 
 public class SetReminderAction extends AnAction {
+    /*public SetReminderAction() {
+        super("Set Reminder",
+                "Set a reminder with a specific time and message",
+                AllIcons.Actions.MenuOpen);
+    }*/
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         ReminderConfigDialog dialog = new ReminderConfigDialog();
