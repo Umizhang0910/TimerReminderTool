@@ -2,17 +2,18 @@ package com.umizhang.core;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 持久化状态组件
  */
+@Service
 @State(name = "ReminderSettings", storages = @Storage("reminderSettings.xml"))
-public class ReminderSettings implements PersistentStateComponent<ReminderSettings.State> {
+public final class ReminderSettings implements PersistentStateComponent<ReminderSettings.State> {
 
     private final State state = new State();
 
@@ -21,7 +22,7 @@ public class ReminderSettings implements PersistentStateComponent<ReminderSettin
     }
 
     @Override
-    public @Nullable ReminderSettings.State getState() {
+    public @NotNull State getState() {
         return state;
     }
 
@@ -35,6 +36,5 @@ public class ReminderSettings implements PersistentStateComponent<ReminderSettin
         public long intervalMinutes = 60; // Default to 1 hour
         public boolean isRepeating = true; // Default to repeating reminder
         public String defaultMessage = "大佬，该休息一下了！";
-        public boolean playSound = true; // Default to playing sound
     }
 }
