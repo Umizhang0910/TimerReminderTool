@@ -2,6 +2,7 @@ package com.umizhang.reminder.ui;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.umizhang.core.ReminderSettings;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -17,6 +18,17 @@ public class ReminderConfigDialog extends DialogWrapper {
         super(true);
         setTitle("Set Timed Reminder");
         init();
+
+        // Load saved settings
+        ReminderSettings.State settings = ReminderSettings.getInstance().getState();
+        assert settings != null;
+        minutesField.setText(String.valueOf(settings.initialDelay));
+        messageField.setText(settings.defaultMessage);
+        reminderTypeCombo.setSelectedItem(settings.isRepeating ? "Recurring Reminder" : "One-time");
+        if (settings.isRepeating) {
+            intervalField.setText(String.valueOf(settings.intervalMinutes));
+            intervalField.setVisible(true);
+        }
     }
 
     @Override
@@ -59,6 +71,24 @@ public class ReminderConfigDialog extends DialogWrapper {
                 "Recurring Reminder".equals(reminderTypeCombo.getSelectedItem()),
                 intervalField.isVisible() ? Long.parseLong(intervalField.getText()) : 0
         );
+    }
+
+    @Override
+    protected void doOKAction() {
+        saveSettings();
+        super.doOKAction();
+    }
+
+    private void saveSettings() {
+        ReminderSettings.State settings = ReminderSettings.getInstance().getState();
+        assert settings != null;
+        settings.initialDelay = Long.parseLong(minutesField.getText());
+        settings.defaultMessage = messageField.getText();
+        settings.isRepeating = "Recurring Reminder".equals(reminderTypeCombo.getSelectedItem());
+
+        if (settings.isRepeating) {
+            settings.intervalMinutes = Long.parseLong(intervalField.getText());
+        }
     }
 
     // Configuration Data Class

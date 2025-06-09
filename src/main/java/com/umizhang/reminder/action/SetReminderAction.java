@@ -15,6 +15,14 @@ public class SetReminderAction extends AnAction {
         if (dialog.showAndGet()) {
             ReminderConfigDialog.ReminderConfig config = dialog.getConfig();
 
+            if (config.initialDelay < 0) {
+                showError("The initial delay cannot be negative");
+                return;
+            }
+            if (config.message == null || config.message.isEmpty()) {
+                showError("The reminder message cannot be empty");
+                return;
+            }
             if (config.isRepeating && config.interval <= 0) {
                 showError("The repeating interval must be greater than 0");
                 return;
