@@ -11,6 +11,7 @@ import com.umizhang.reminder.ui.ReminderConfigDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -23,12 +24,28 @@ public final class ReminderService {
     private ScheduledFuture<?> reminderTask;
     private long intervalMinutes;
     private ReminderState state = ReminderState.STOPPED;
-    private long remainingTime;
+    private long remainingSeconds;
     private String currentMessage;
 
 
     private ScheduledFuture<?> timerUpdateTask;
 
+    private static String getRemainingTimeText(long seconds) {
+        long mins = seconds / 60;
+        long secs = seconds % 60;
+        return String.format("⏱ %02d:%02d", mins, secs);
+    }
+
+    private long getRemainingSeconds() {
+        if (reminderTask != null && !reminderTask.isDone()) {
+            try {
+                return reminderTask.getDelay(TimeUnit.SECONDS);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        return 0;
+    }
 
     public void scheduleReminder(ReminderConfigDialog.ReminderConfig config) {
         // Cancel existing reminder
@@ -73,13 +90,12 @@ public final class ReminderService {
     public void pauseReminder() {
         if (reminderTask != null && !reminderTask.isDone()) {
             // Get the remaining time before the next reminder
-            remainingTime = Math.max(0, reminderTask.getDelay(TimeUnit.MINUTES));
-
+            this.remainingSeconds = Math.max(0, getRemainingSeconds());
             reminderTask.cancel(false);
             reminderTask = null;
 
             state = ReminderState.PAUSED;
-            showNotification("Reminder has been paused. Remaining time: " + remainingTime + " minutes");
+            showNotification("Reminder has been paused. Remaining time: " + getRemainingTimeText(remainingSeconds) + " (mm:ss)");
         }
     }
 
@@ -87,12 +103,12 @@ public final class ReminderService {
         if (state == ReminderState.PAUSED) {
             // Reschedule the reminder with the remaining time
             ReminderConfigDialog.ReminderConfig resumeConfig = new ReminderConfigDialog.ReminderConfig(
-                    remainingTime, currentMessage, isRepeating, intervalMinutes
+                    remainingSeconds / 60, currentMessage, isRepeating, intervalMinutes
             );
             scheduleReminder(resumeConfig);
 
             state = ReminderState.ACTIVE;
-            showNotification("Reminder has been resumed. Next reminder in: " + remainingTime + " minutes");
+            showNotification("Reminder has been resumed. Next reminder in: " + getRemainingTimeText(remainingSeconds) + " (mm:ss)");
         }
     }
 
@@ -102,11 +118,11 @@ public final class ReminderService {
             Notification notification = new Notification("ReminderGroup", // Must be registered in plugin.xml
                     "Timer reminder", message, NotificationType.INFORMATION);
 
-            if (isRepeating && state == ReminderState.ACTIVE) {
-                notification.addAction(NotificationAction.createSimple("Pause reminder",
+            if (state == ReminderState.ACTIVE) {
+                notification.addAction(NotificationAction.createSimple("Pause",
                         this::pauseReminder));
-            } else if (isRepeating && state == ReminderState.PAUSED) {
-                notification.addAction(NotificationAction.createSimple("Resume reminder",
+            } else if (state == ReminderState.PAUSED) {
+                notification.addAction(NotificationAction.createSimple("Resume",
                         this::resumeReminder));
             }
 
@@ -116,8 +132,8 @@ public final class ReminderService {
                         () -> ApplicationManager.getApplication().getService(ReminderService.class)
                                 .stopRepeatingReminder()));
             }*/
-            if (isRepeating && state != ReminderState.STOPPED) {
-                notification.addAction(NotificationAction.createSimple("Stop reminder",
+            if (state != ReminderState.STOPPED) {
+                notification.addAction(NotificationAction.createSimple("Stop",
                         this::stopRepeatingReminder));
             }
             Notifications.Bus.notify(notification);
@@ -127,7 +143,7 @@ public final class ReminderService {
     // Check if reminder is active
     public boolean isReminderActive() {
         // return reminderTask != null && !reminderTask.isDone();
-        return state == ReminderState.ACTIVE;
+        return List.of(ReminderState.ACTIVE, ReminderState.PAUSED).contains(state);
     }
 
     public boolean isReminderPaused() {
@@ -137,31 +153,11 @@ public final class ReminderService {
     public String getStatusText() {
         if (state == ReminderState.ACTIVE) {
             // 计算剩余时间并格式化
-            long seconds = getRemainingSeconds();
-            long mins = seconds / 60;
-            long secs = seconds % 60;
-            return String.format("⏱ %02d:%02d", mins, secs);
+            return getRemainingTimeText(getRemainingSeconds());
         } else if (state == ReminderState.PAUSED) {
             return "⏸ Reminder Paused";
         }
         return "⏰ No reminder";
-    }
-
-    // 调试用状态覆盖
-    public void debugSetState(ReminderState state) {
-        this.state = state;
-        System.out.println("调试：服务状态设置为 " + state);
-    }
-
-    private long getRemainingSeconds() {
-        if (reminderTask != null && !reminderTask.isDone()) {
-            try {
-                return reminderTask.getDelay(TimeUnit.SECONDS);
-            } catch (Exception e) {
-                return 0;
-            }
-        }
-        return 0;
     }
 
     private enum ReminderState {ACTIVE, PAUSED, STOPPED}
