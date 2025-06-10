@@ -24,9 +24,8 @@ public class ReminderActionGroup extends DefaultActionGroup {
         this.project = project;
     }
 
-    @NotNull
     @Override
-    public AnAction[] getChildren(AnActionEvent e) {
+    public AnAction @NotNull [] getChildren(AnActionEvent e) {
         // 从项目获取服务
         ReminderService service = ApplicationManager.getApplication().getService(ReminderService.class);
 
