@@ -7,6 +7,7 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
@@ -28,6 +29,7 @@ import java.awt.event.MouseEvent;
 public final class TimerReminderStatusWidget
         implements StatusBarWidget, StatusBarWidget.TextPresentation, Disposable {
 
+    private static final Logger log = Logger.getInstance(TimerReminderStatusWidget.class);
     private final Project project;
     private String text = "⏰ No reminder";
     private Alarm alarm;
@@ -36,7 +38,7 @@ public final class TimerReminderStatusWidget
 
     public TimerReminderStatusWidget(Project project) {
         this.project = project;
-        System.out.println("Create widget instance: {}" + project.getName());
+        log.info("Create widget instance: {}" + project.getName());
     }
 
     @NotNull
@@ -73,8 +75,8 @@ public final class TimerReminderStatusWidget
 
     private void showPopupMenu(Component component) {
         if (disposed || project.isDisposed() || component == null) {
-            System.out.printf("Unable to display menu：disposed=%s, projectDisposed=%s, componentNull=%s",
-                    disposed, project.isDisposed(), component == null);
+            log.info(String.format("Unable to display menu：disposed=%s, projectDisposed=%s, componentNull=%s",
+                    disposed, project.isDisposed(), component == null));
             return;
         }
 
@@ -97,9 +99,9 @@ public final class TimerReminderStatusWidget
             // 显示在组件下方
             popup.showUnderneathOf(component);
 
-            System.out.println("Popup menu displayed");
+            log.info("Popup menu displayed");
         } catch (Exception e) {
-            System.out.printf("Failed to display popup menu: %s", e.getMessage());
+            log.info(String.format("Failed to display popup menu: %s", e.getMessage()));
             Notifications.Bus.notify(
                     new Notification("ReminderGroup", "Popup error",
                             "Failed to show menu: " + e.getMessage(),
@@ -112,7 +114,7 @@ public final class TimerReminderStatusWidget
     public void install(@NotNull StatusBar statusBar) {
         if (disposed) return;
 
-        System.out.println("Install widget: {}" + project.getName());
+        log.info("Install widget: " + project.getName());
         this.statusBar = statusBar;
 
         // 1. 初始化定时器
@@ -122,7 +124,7 @@ public final class TimerReminderStatusWidget
         ApplicationManager.getApplication().invokeLater(() -> {
             updateFromService();
             statusBar.updateWidget(ID());
-            System.out.println("Widget initial update completed");
+            log.info("Widget initial update completed");
         });
 
         // 3. 启动定时更新循环
@@ -139,7 +141,7 @@ public final class TimerReminderStatusWidget
                     updateFromService();
                     if (statusBar != null) {
                         statusBar.updateWidget(ID());
-                        System.out.println("Widget periodic update: {}" + text);
+                        log.info("Widget periodic update: {}" + text);
                     }
                 } finally {
                     // 确保继续调度更新
@@ -163,7 +165,7 @@ public final class TimerReminderStatusWidget
 
     @Override
     public void dispose() {
-        System.out.println("Widget disposal: {}" + project.getName());
+        log.info("Widget disposal: " + project.getName());
 
         // 1. 标记为已销毁
         disposed = true;
@@ -180,7 +182,7 @@ public final class TimerReminderStatusWidget
 
     // 辅助方法用于诊断
     public void debugForceUpdate() {
-        System.out.println("Force widget update");
+        log.info("Force widget update");
         if (!disposed && statusBar != null) {
             updateFromService();
             statusBar.updateWidget(ID());

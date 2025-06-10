@@ -6,10 +6,9 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.diagnostic.Logger;
 import com.umizhang.core.ThreadPoolScheduler;
 import com.umizhang.reminder.ui.ReminderConfigDialog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public final class ReminderService {
-    private static final Logger log = LoggerFactory.getLogger(ReminderService.class);
+    private static final Logger log = Logger.getInstance(ReminderService.class);
     private final ScheduledExecutorService executorService = ApplicationManager.getApplication().getService(ThreadPoolScheduler.class).getScheduler();
     public boolean isRepeating;
     private ScheduledFuture<?> reminderTask;
@@ -27,24 +26,10 @@ public final class ReminderService {
     private long remainingSeconds;
     private String currentMessage;
 
-
-    private ScheduledFuture<?> timerUpdateTask;
-
     private static String getRemainingTimeText(long seconds) {
         long mins = seconds / 60;
         long secs = seconds % 60;
         return String.format("⏱ %02d:%02d", mins, secs);
-    }
-
-    private long getRemainingSeconds() {
-        if (reminderTask != null && !reminderTask.isDone()) {
-            try {
-                return reminderTask.getDelay(TimeUnit.SECONDS);
-            } catch (Exception e) {
-                return 0;
-            }
-        }
-        return 0;
     }
 
     public void scheduleReminder(ReminderConfigDialog.ReminderConfig config) {
@@ -118,10 +103,10 @@ public final class ReminderService {
             Notification notification = new Notification("ReminderGroup", // Must be registered in plugin.xml
                     "Timer reminder", message, NotificationType.INFORMATION);
 
-            if (state == ReminderState.ACTIVE) {
+            if (reminderTask != null && !reminderTask.isDone() && intervalMinutes > 0 && state == ReminderState.ACTIVE) {
                 notification.addAction(NotificationAction.createSimple("Pause",
                         this::pauseReminder));
-            } else if (state == ReminderState.PAUSED) {
+            } else if (reminderTask != null && !reminderTask.isDone() && intervalMinutes > 0 && state == ReminderState.PAUSED) {
                 notification.addAction(NotificationAction.createSimple("Resume",
                         this::resumeReminder));
             }
@@ -132,7 +117,7 @@ public final class ReminderService {
                         () -> ApplicationManager.getApplication().getService(ReminderService.class)
                                 .stopRepeatingReminder()));
             }*/
-            if (state != ReminderState.STOPPED) {
+            if (reminderTask != null && !reminderTask.isDone() && intervalMinutes > 0 && state != ReminderState.STOPPED) {
                 notification.addAction(NotificationAction.createSimple("Stop",
                         this::stopRepeatingReminder));
             }
@@ -151,13 +136,24 @@ public final class ReminderService {
     }
 
     public String getStatusText() {
-        if (state == ReminderState.ACTIVE) {
+        if (reminderTask != null && !reminderTask.isDone() && state == ReminderState.ACTIVE) {
             // 计算剩余时间并格式化
             return getRemainingTimeText(getRemainingSeconds());
-        } else if (state == ReminderState.PAUSED) {
+        } else if (reminderTask != null && !reminderTask.isDone() && state == ReminderState.PAUSED) {
             return "⏸ Reminder Paused";
         }
         return "⏰ No reminder";
+    }
+
+    private long getRemainingSeconds() {
+        if (reminderTask != null && !reminderTask.isDone()) {
+            try {
+                return reminderTask.getDelay(TimeUnit.SECONDS);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        return 0;
     }
 
     private enum ReminderState {ACTIVE, PAUSED, STOPPED}
