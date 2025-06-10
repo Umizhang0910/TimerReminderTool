@@ -136,10 +136,10 @@ public final class ReminderService {
     }
 
     public String getStatusText() {
-        if (reminderTask != null && !reminderTask.isDone() && state == ReminderState.ACTIVE) {
+        if (state == ReminderState.ACTIVE) {
             // 计算剩余时间并格式化
             return getRemainingTimeText(getRemainingSeconds());
-        } else if (reminderTask != null && !reminderTask.isDone() && state == ReminderState.PAUSED) {
+        } else if (state == ReminderState.PAUSED) {
             return "⏸ Reminder Paused";
         }
         return "⏰ No reminder";
