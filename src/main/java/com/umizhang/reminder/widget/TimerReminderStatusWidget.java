@@ -24,14 +24,14 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 /**
- * 状态栏小部件
+ * Status bar widget
  */
 public final class TimerReminderStatusWidget
         implements StatusBarWidget, StatusBarWidget.TextPresentation, Disposable {
 
     private static final Logger log = Logger.getInstance(TimerReminderStatusWidget.class);
     private final Project project;
-    private String text = "⏰ No reminder";
+    private String text = "No reminder";
     private Alarm alarm;
     private StatusBar statusBar;
     private boolean disposed = false;
@@ -65,7 +65,7 @@ public final class TimerReminderStatusWidget
 
     @Override
     public @NotNull String getTooltipText() {
-        return "⏰ Manage reminders";
+        return "Manage reminders";
     }
 
     @Override
@@ -81,22 +81,20 @@ public final class TimerReminderStatusWidget
         }
 
         try {
-            // 创建操作组
             ReminderActionGroup actionGroup = new ReminderActionGroup(project);
 
-            // 获取数据上下文（重要！）
             DataContext dataContext = DataManager.getInstance().getDataContext(component);
 
-            // 创建弹出菜单（不使用 ActionPlaces）
+            // Create a pop-up menu (without using ActionPlaces)
             ListPopup popup = JBPopupFactory.getInstance().createActionGroupPopup(
                     "Reminder Actions",
                     actionGroup,
-                    dataContext, // 传入数据上下文
+                    dataContext,
                     JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
-                    true // 允许搜索
+                    true
             );
 
-            // 显示在组件下方
+            // Displayed below the component
             popup.showUnderneathOf(component);
 
             log.info("Popup menu displayed");
@@ -144,22 +142,20 @@ public final class TimerReminderStatusWidget
                         log.info("Widget periodic update: {}" + text);
                     }
                 } finally {
-                    // 确保继续调度更新
                     scheduleUpdate();
                 }
             }
-        }, 1000); // 每秒更新一次
+        }, 1000);
     }
 
     private void updateFromService() {
         if (project.isDisposed()) return;
 
-        // 获取服务状态
         ReminderService service = ApplicationManager.getApplication().getService(ReminderService.class);
         if (service != null) {
             text = service.getStatusText();
         } else {
-            text = "⏰ No reminder";
+            text = "No reminder";
         }
     }
 
@@ -167,20 +163,16 @@ public final class TimerReminderStatusWidget
     public void dispose() {
         log.info("Widget disposal: " + project.getName());
 
-        // 1. 标记为已销毁
         disposed = true;
 
-        // 2. 清理定时器
         if (alarm != null && !alarm.isDisposed()) {
             alarm.cancelAllRequests();
             Disposer.dispose(alarm);
         }
 
-        // 3. 清除引用
         statusBar = null;
     }
 
-    // 辅助方法用于诊断
     public void debugForceUpdate() {
         log.info("Force widget update");
         if (!disposed && statusBar != null) {

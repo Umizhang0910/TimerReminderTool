@@ -9,7 +9,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 持久化状态组件
+ * Persistent state component
  */
 @Service
 @State(name = "ReminderSettings", storages = @Storage("reminderSettings.xml"))
@@ -35,6 +35,6 @@ public final class ReminderSettings implements PersistentStateComponent<Reminder
         public long initialDelay = 0; // Default to no initial delay
         public long intervalMinutes = 60; // Default to 1 hour
         public boolean isRepeating = true; // Default to repeating reminder
-        public String defaultMessage = "大佬，该休息一下了！";
+        public String defaultMessage = "";
     }
 }

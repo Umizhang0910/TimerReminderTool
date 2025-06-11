@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.StatusBarWidgetFactory;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 public class TimerWidgetFactory implements StatusBarWidgetFactory {
@@ -43,6 +42,6 @@ public class TimerWidgetFactory implements StatusBarWidgetFactory {
 
     @Override
     public boolean isEnabledByDefault() {
-        return true; // 默认启用小部件
+        return true;
     }
 }

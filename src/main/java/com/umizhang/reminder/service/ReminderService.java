@@ -29,7 +29,7 @@ public final class ReminderService {
     private static String getRemainingTimeText(long seconds) {
         long mins = seconds / 60;
         long secs = seconds % 60;
-        return String.format("⏱ %02d:%02d", mins, secs);
+        return String.format("%02d:%02d", mins, secs);
     }
 
     public void scheduleReminder(ReminderConfigDialog.ReminderConfig config) {
@@ -140,9 +140,9 @@ public final class ReminderService {
             // 计算剩余时间并格式化
             return getRemainingTimeText(getRemainingSeconds());
         } else if (state == ReminderState.PAUSED) {
-            return "⏸ Reminder Paused";
+            return "Reminder Paused";
         }
-        return "⏰ No reminder";
+        return "No reminder";
     }
 
     private long getRemainingSeconds() {

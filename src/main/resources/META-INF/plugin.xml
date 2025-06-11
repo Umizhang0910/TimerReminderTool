@@ -1,11 +1,11 @@
 <idea-plugin>
-    <id>com.umizhang.unique.plugin.id</id>
+    <id>com.umizhang.plugin</id>
     <name>Timer Reminder Tool</name>
     <version>${project.version}</version>
-    <vendor email="umizhang0910@126.com" url="https://xxx.com">Umizhang</vendor>
+    <vendor email="umizhang0910@126.com" url="https://umizhang.com">Umizhang</vendor>
 
     <description><![CDATA[
-        <p>EN: Helps developers manage work time with custom reminders.</p>
+        <p>Helps developers manage work time with custom reminders.</p>
         <p>Features:</p>
         <ul>
             <li>Set custom reminder intervals</li>
@@ -14,7 +14,7 @@
         </ul>
         </br>
         </br>
-        <p>CN: 这是一个定时提醒工具，目的是让你在繁忙的编码工作中间歇的休息下，劳逸结合~</p>
+        <p>这是一个定时提醒工具，目的是让你在繁忙的编码工作中间歇的休息下，劳逸结合~</p>
         <p>特性:</p>
         <ul>
             <li>设置自定义提醒间隔</li>
@@ -29,6 +29,7 @@
         <ul>
             <li>Single timer functionality</li>
             <li>Custom message support</li>
+            <li>Stats Bar widget support</li>
         </ul>
     ]]></change-notes>
 

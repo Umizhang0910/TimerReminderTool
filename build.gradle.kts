@@ -19,7 +19,6 @@ intellij {
     plugins.set(
         listOf(
             "com.intellij.java",  // Java语言支持
-            "org.jetbrains.kotlin" // Kotlin支持（可选）
         )
     )
 }
@@ -41,6 +40,8 @@ tasks {
     patchPluginXml {
         sinceBuild.set("231")    // 最低兼容版本
         untilBuild.set("241.*")  // 最高兼容版本
+        /*pluginDescription.set("<p>Helps developers manage work time with custom reminders.</p>")
+        changeNotes.set(""" 1.0.0: init version """)*/
     }
 
     // 运行配置

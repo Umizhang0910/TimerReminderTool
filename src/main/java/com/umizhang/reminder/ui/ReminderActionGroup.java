@@ -26,10 +26,8 @@ public class ReminderActionGroup extends DefaultActionGroup {
 
     @Override
     public AnAction @NotNull [] getChildren(AnActionEvent e) {
-        // 从项目获取服务
         ReminderService service = ApplicationManager.getApplication().getService(ReminderService.class);
 
-        // 根据当前状态返回不同的操作项
         if (service == null) {
             /*return new AnAction[]{
                     new SetReminderAction()
@@ -40,7 +38,6 @@ public class ReminderActionGroup extends DefaultActionGroup {
 
         List<AnAction> actions = new ArrayList<>();
 
-        // 添加通用操作
         // actions.add(new SetReminderAction());
 
         if (service.isReminderActive()) {
